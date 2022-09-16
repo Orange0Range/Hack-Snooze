@@ -24,7 +24,7 @@ class Story {
   /** Parses hostname out of URL and returns it. */
 
   getHostName() {
-    // UNIMPLEMENTED: complete this function!
+
     let newURL = new URL(this.url).host
     //console.log(newURL)
     return newURL;
@@ -69,7 +69,7 @@ class StoryList {
   }
 
   async removeStory(user, story){
-    user.ownStories = user.ownStories.filter(s => s.storyId !== story.storyId)
+    user.ownStories = user.ownStories.filter(s => s.storyId !== story.storyId)    //Remove story from all lists
     user.favorites = user.favorites.filter(s => s.storyId !== story.storyId)
     this.ownStories = this.ownStories.filter(s => s.storyId !== story.storyId)
     const token = user.loginToken;
@@ -150,7 +150,7 @@ class User {
 
   //Favorite stories
   async addFavorite(story){
-    this.favorites.push(story);
+    this.favorites.push(story);         //Add story to fav list
     console.debug('adding Favs')
     const t = this.loginToken;
     const response = await axios({
@@ -162,7 +162,7 @@ class User {
 
   async removeFavorite(story){
     console.log('removing...')
-    this.favorites = this.favorites.filter(favs => favs.storyId !== story.storyId);
+    this.favorites = this.favorites.filter(favs => favs.storyId !== story.storyId);  //Remove story from fav list
     const t = this.loginToken;
     
     const response = await axios({

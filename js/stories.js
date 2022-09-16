@@ -20,10 +20,12 @@ async function getAndShowStoriesOnStart() {
  */
 
 function generateStoryMarkup(story, addDel = false) {
-  // console.debug("generateStoryMarkup", story);
+  //console.debug("generateStoryMarkup");
 
   const hostName = story.getHostName();
 
+  //Check if logged in, if logged in show option to add favs
+  //if its a created story, include delete button
   return $(`
       <li id="${story.storyId}">
         <a href="${story.url}" target="a_blank" class="story-link">
@@ -31,8 +33,8 @@ function generateStoryMarkup(story, addDel = false) {
         </a>
         <small class="story-hostname">(${hostName})</small>
         <small class="story-author">by ${story.author}</small>
-        ${Boolean(currentUser)? addFavBtn(currentUser, story):""}
-        ${addDel? addDelBtn(currentUser, story):""}
+        ${Boolean(currentUser)? addFavBtn(currentUser, story):""}           
+        ${addDel? addDelBtn(currentUser, story):""}                         
         <small class="story-user">posted by ${story.username}</small>
         
       </li>
@@ -41,7 +43,8 @@ function generateStoryMarkup(story, addDel = false) {
 
 // && (this.favorites.some(st => (st.storyId === story.storyId
 function addFavBtn(user, story){
-  if(user.favorites.some(st => (st.storyId === story.storyId))){
+  //If is already in fav stories, add appropriate tag
+  if(user.favorites.some(st => (st.storyId === story.storyId))){            
     return `<span class = 'fav'><small class = "favsYes">&#128150;</small></span>`
   }
   return `<span class = 'fav'><small class = "favsNo">&#128150;</small></span>`
@@ -52,18 +55,18 @@ $storyList.on('click', '.fav', toggleFav);
 async function toggleFav(e){
   e.preventDefault();
   console.log('toggling...')
-  const favID = e.target.closest('li').id
-  const story = storyList.stories.find( s => s.storyId === favID.toString())
-  const favStory = currentUser.favorites.find(s => s.storyId === favID.toString())
+  const favID = e.target.closest('li').id                                             //Used to find story associated with fav button
+  const story = storyList.stories.find( s => s.storyId === favID.toString())          //Find story if in all stories list
+  const favStory = currentUser.favorites.find(s => s.storyId === favID.toString())    //Find story if in favs story list
 
-  if($(e.target).hasClass('favsNo')){
+  if($(e.target).hasClass('favsNo')){   
     console.debug('add fav')
     $(e.target).toggleClass('favsNo favsYes')
-    await currentUser.addFavorite(story);
+    await currentUser.addFavorite(story);         //Add story to fav
   }else{
     console.log('remove fav')
     $(e.target).toggleClass('favsNo favsYes')
-    await currentUser.removeFavorite(favStory);
+    await currentUser.removeFavorite(favStory);  //Remove story from fav
   }
   hidePageComponents();
   putStoriesOnPage();
@@ -77,8 +80,8 @@ $storyList.on('click', '.delBtn', deleteStory)
 async function deleteStory(e){
   e.preventDefault();
   console.log('deleting....')
-  const ownID = e.target.closest('li').id
-  const story = currentUser.ownStories.find( s => s.storyId === ownID.toString())  
+  const ownID = e.target.closest('li').id                                           //Used to find story associated with delete button
+  const story = currentUser.ownStories.find( s => s.storyId === ownID.toString())   //Find story if in all stories list
   const t = currentUser.loginToken;
   
   const response = await axios({
@@ -86,7 +89,7 @@ async function deleteStory(e){
     method: "DELETE",
     data: {'token':t},
   })
-  currentUser.ownStories = currentUser.ownStories.filter(own => own.storyId !== story.storyId);
+  currentUser.ownStories = currentUser.ownStories.filter(own => own.storyId !== story.storyId);       //Remove created story from ownstory list
 
   hidePageComponents();
   putStoriesOnPage();
@@ -111,6 +114,7 @@ async function putStoriesOnPage() {
   }
 
   $allStoriesList.show();
+  //If the user is logged in, show fav and created stories
   if(currentUser){
     $headings.show();
     console.debug("Putting fav stories on page")
@@ -135,10 +139,10 @@ async function submitStory(e){
   const newTitle = $("#newStory-title");
   const newURL = $("#newStory-url");
   const newAuthor = $("#newStory-author");
-  if(!currentUser){
+  if(!currentUser){                       //Can't submit if not logged in
     alert('Not Logged In')
   }else{
-    if(newTitle.val() !== "" && newURL.val() !== "" && newAuthor.val() !== "")
+    if(newTitle.val() !== "" && newURL.val() !== "" && newAuthor.val() !== "")      //No empty fields allowed when submitting
     {
       console.log('submitting')
       const res_Story = await storyList.addStory(currentUser, {'author':newAuthor.val(), 'title':newTitle.val(), 'url':newURL.val()});
@@ -148,7 +152,6 @@ async function submitStory(e){
       newAuthor.val("");
     }  
   }
-  
 }
 $newStory.on('submit', submitStory);
 

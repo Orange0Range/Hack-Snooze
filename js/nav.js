@@ -37,7 +37,7 @@ function updateNavOnLogin() {
 function submitClick(e){
   console.debug('Submit A New Story')
   hidePageComponents();
-  $newStory.show();
+  $newStory.show();         //Show form to submit story
 }
 
 $navSubmit.on('click', submitClick);
